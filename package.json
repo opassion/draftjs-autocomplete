@@ -1,11 +1,14 @@
 {
   "name": "react-draft-autocomplete",
+  "homepage": "http://54.65.240.103/draft-autocomplete",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "draft-js": "^0.10.5",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "react-scripts": "2.1.1"
+    "react-scripts": "2.1.1",
+    "styled-components": "^4.1.2"
   },
   "scripts": {
     "start": "react-scripts start",
