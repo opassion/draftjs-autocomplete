@@ -72,7 +72,7 @@ class TypeaheadEditor extends Editor {
       this.typeaheadState = null;
       return null;
     }
-
+    
     const tempRange = window.getSelection().getRangeAt(0).cloneRange();
     tempRange.setStart(tempRange.startContainer, typeaheadRange.start);
 

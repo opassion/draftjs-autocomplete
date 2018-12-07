@@ -6,21 +6,37 @@ import { TypeaheadEditor, normalizeSelectedIndex } from './TypeaheadEditor';
 import { PERSON, RELATION, HASHTAG } from '../constants';
 
 const Wrapper = styled.div`
-  min-height: 200px;
   padding: 10px;
   border: 1px solid #ccc;
   background: white;
+  z-index: 1;
+  position: relative;
+  height: calc(100vh - 30px);
+  overflow: auto;
+`;
+
+const EditorHolder = styled.div`
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+
+  > div {
+    height: 100%;
+  }
 `;
 
 const SelectDropdown = styled.div`
   border: 1px solid #ccc;
   background: white;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, .1), 0 1px 10px rgba(0, 0, 0, .35);
-  border-radius: 3;
+  border-radius: 3px;
   overflow: hidden;
   position: absolute;
   max-width: 250px;
   text-align: left;
+  z-index: 101;
   left: ${props => props.left}px;
   top: ${props => props.top}px;
 `;
@@ -43,6 +59,13 @@ const MentionText = styled.span`
   color: #3290cc;
 `;
 
+const decorator = new CompositeDecorator([
+  {
+    strategy: getEntityStrategy('SEGMENTED'),
+    component: MentionSpan,
+  },
+]);
+
 const MENTION_ENTITY_KEY = Entity.create('MENTION', 'SEGMENTED');
 
 function filterList(query, list) {
@@ -57,7 +80,7 @@ function MentionSpan(props) {
       {props.children}
     </MentionText>
   );
-};
+}
 
 function getEntityStrategy(mutability) {
   return function (contentBlock, callback) {
@@ -73,13 +96,6 @@ function getEntityStrategy(mutability) {
     );
   };
 }
-
-const decorator = new CompositeDecorator([
-  {
-    strategy: getEntityStrategy('SEGMENTED'),
-    component: MentionSpan,
-  },
-]);
 
 function getFilteredList(text) {
   let filteredList = [];
@@ -108,8 +124,12 @@ function Mentions ({ left, top, selectedIndex, text }) {
   
   const normalizedIndex = normalizeSelectedIndex(selectedIndex, filteredList.length);
 
+  const wrapper = document.getElementById("main-editor");
+
+  const rect = wrapper.getBoundingClientRect();
+
   return (
-    <SelectDropdown left={left} top={top}>
+    <SelectDropdown left={left - rect.left} top={wrapper.scrollTop + top - rect.top}>
       {filteredList.map((item, index) => {
         return (
           <SelectItem highlight={index === normalizedIndex}>
@@ -122,7 +142,7 @@ function Mentions ({ left, top, selectedIndex, text }) {
       })}
     </SelectDropdown>
   );
-};
+}
 
 class MentionsEditorExample extends Component {
   constructor() {
@@ -134,9 +154,12 @@ class MentionsEditorExample extends Component {
     };
   }
 
-  onChange = (editorState) => this.setState({ editorState });
+  onChange = (editorState) => this.setState({ editorState })
 
-  onTypeaheadChange = (typeaheadState) => this.setState({ typeaheadState });
+  onTypeaheadChange = (typeaheadState) => {
+    console.log(typeaheadState);
+    this.setState({ typeaheadState });
+  }
 
   handleTypeaheadReturn = (text, selectedIndex, selection) => {
     const { editorState } = this.state;
@@ -155,7 +178,7 @@ class MentionsEditorExample extends Component {
     );
 
     this.setState({ editorState: nextEditorState });
-  };
+  }
 
   renderTypeahead() {
     if (this.state.typeaheadState === null) {
@@ -167,17 +190,17 @@ class MentionsEditorExample extends Component {
 
   render() {
     return (
-      <div>
+      <Wrapper id="main-editor">
         {this.renderTypeahead()}
-        <Wrapper>
+        <EditorHolder>
           <TypeaheadEditor
             editorState={this.state.editorState}
             onChange={this.onChange}
             onTypeaheadChange={this.onTypeaheadChange}
             handleTypeaheadReturn={this.handleTypeaheadReturn}
           />
-        </Wrapper>
-      </div>
+        </EditorHolder>
+      </Wrapper>
     );
   }
 }
