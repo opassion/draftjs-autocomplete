@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { EditorState, Entity, Modifier, CompositeDecorator } from 'draft-js';
 
@@ -11,8 +11,9 @@ const Wrapper = styled.div`
   background: white;
   z-index: 1;
   position: relative;
-  height: calc(100vh - 30px);
+  height: 400px;
   overflow: auto;
+  margin-bottom: 15px;
 `;
 
 const EditorHolder = styled.div`
@@ -118,18 +119,15 @@ function getFilteredList(text) {
   };
 }
 
-function Mentions ({ left, top, selectedIndex, text }) {
+function Mentions({ left, top, selectedIndex, text, clientTop, clientLeft }) {
   
   const { filteredList } = getFilteredList(text);
   
   const normalizedIndex = normalizeSelectedIndex(selectedIndex, filteredList.length);
-
-  const wrapper = document.getElementById("main-editor");
-
-  const rect = wrapper.getBoundingClientRect();
-
+  
+  
   return (
-    <SelectDropdown left={left - rect.left} top={wrapper.scrollTop + top - rect.top}>
+    <SelectDropdown left={left - clientLeft} top={top + clientTop}>
       {filteredList.map((item, index) => {
         return (
           <SelectItem highlight={index === normalizedIndex} key={`list-${index}`}>
@@ -144,10 +142,10 @@ function Mentions ({ left, top, selectedIndex, text }) {
   );
 }
 
-class MentionsEditorExample extends Component {
+class MentionsEditorExample extends React.Component {
   constructor() {
     super();
-
+    this.wrapper = React.createRef();
     this.state = {
       editorState: EditorState.createEmpty(decorator),
       typeaheadState: null
@@ -188,18 +186,30 @@ class MentionsEditorExample extends Component {
     if (this.state.typeaheadState === null) {
       return null;
     }
+
+    let clientTop = 0;
+    let clientLeft = 0;
+
+    if (this.wrapper && this.wrapper.current) {
+      const rect = this.wrapper.current.getBoundingClientRect();
+      clientTop = this.wrapper.current.scrollTop - rect.top;
+      clientLeft = rect.left;
+    }
+
     
-    return <Mentions {...this.state.typeaheadState} />;
+    return <Mentions {...this.state.typeaheadState} clientTop={clientTop} clientLeft={clientLeft} />;
   }
 
   render() {
+    
     return (
-      <Wrapper id="main-editor">
+      <Wrapper ref={this.wrapper}>
         {this.renderTypeahead()}
         <EditorHolder>
           <TypeaheadEditor
             editorState={this.state.editorState}
             onChange={this.onChange}
+            typeaheadState={this.state.typeaheadState}
             onTypeaheadChange={this.onTypeaheadChange}
             handleTypeaheadReturn={this.handleTypeaheadReturn}
           />

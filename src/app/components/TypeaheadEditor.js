@@ -9,10 +9,9 @@ function normalizeSelectedIndex(selectedIndex, max) {
   return index;
 }
 
-class TypeaheadEditor extends Editor {
+class TypeaheadEditor extends React.Component {
   constructor(props) {
     super(props);
-    this.typeaheadState = null;
   }
 
   hasEntityAtSelection() {
@@ -59,14 +58,18 @@ class TypeaheadEditor extends Editor {
     };
   }
 
-  getTypeaheadState(invalidate = true) {
-    if (!invalidate) {
-      return this.typeaheadState;
-    }
+  getCurrentTypeaheadState() {
+    return this.props.typeaheadState;
+  }
 
+  updateTypeaheadState(typeaheadState) {
+    this.props.onTypeaheadChange && this.props.onTypeaheadChange(typeaheadState);
+  }
+
+  createNewTypeaheadState() {
     const typeaheadRange = this.getTypeaheadRange();
     if (!typeaheadRange) {
-      this.typeaheadState = null;
+      this.props.onTypeaheadChange(null);
       return null;
     }
     
@@ -76,13 +79,12 @@ class TypeaheadEditor extends Editor {
     const rangeRect = tempRange.getBoundingClientRect();
     let [left, top] = [rangeRect.left, rangeRect.bottom];
 
-    this.typeaheadState = {
+    this.props.onTypeaheadChange({
       left,
       top,
       text: typeaheadRange.text,
       selectedIndex: 0
-    };
-    return this.typeaheadState;
+    });
   }
 
   onChange = (editorState) => {
@@ -92,25 +94,23 @@ class TypeaheadEditor extends Editor {
     // updated.
     if (this.props.onTypeaheadChange) {
       window.requestAnimationFrame(() => {
-        this.props.onTypeaheadChange(this.getTypeaheadState());
+        this.createNewTypeaheadState();
       });
     }
   };
 
   onEscape = (e) => {
-    if (!this.getTypeaheadState(false)) {
+    if (!this.getCurrentTypeaheadState()) {
       this.props.onEscape && this.props.onEscape(e);
       return;
     }
 
     e.preventDefault();
-    this.typeaheadState = null;
-
-    this.props.onTypeaheadChange && this.props.onTypeaheadChange(null);
+    this.updateTypeaheadState(null);
   };
 
   onArrow(e, originalHandler, nudgeAmount) {
-    let typeaheadState = this.getTypeaheadState(false);
+    let typeaheadState = this.getCurrentTypeaheadState();
 
     if (!typeaheadState) {
       originalHandler && originalHandler(e);
@@ -119,9 +119,7 @@ class TypeaheadEditor extends Editor {
 
     e.preventDefault();
     typeaheadState.selectedIndex += nudgeAmount;
-    this.typeaheadState = typeaheadState;
-
-    this.props.onTypeaheadChange && this.props.onTypeaheadChange(typeaheadState);
+    this.updateTypeaheadState(typeaheadState);
   }
 
   onUpArrow = (e) => {
@@ -138,21 +136,21 @@ class TypeaheadEditor extends Editor {
   }
 
   handleReturn = (e) => {
-    if (this.typeaheadState) {
+    const typeaheadState = this.getCurrentTypeaheadState();
+    if (typeaheadState) {
       if (this.props.handleTypeaheadReturn) {
         const contentState = this.props.editorState.getCurrentContent();
 
         const selection = contentState.getSelectionAfter();
         const entitySelection = selection.set(
-          'anchorOffset', selection.getFocusOffset() - this.typeaheadState.text.length
+          'anchorOffset', selection.getFocusOffset() - typeaheadState.text.length
         );
 
         this.props.handleTypeaheadReturn(
-          this.typeaheadState.text, this.typeaheadState.selectedIndex, entitySelection
+          typeaheadState.text, typeaheadState.selectedIndex, entitySelection
         );
         
-        this.typeaheadState = null;
-        this.props.onTypeaheadChange && this.props.onTypeaheadChange(null);
+        this.updateTypeaheadState(null);
       } else {
         console.error(
           "Warning: A typeahead is showing and return was pressed but `handleTypeaheadReturn` " +
