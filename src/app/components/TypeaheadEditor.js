@@ -41,9 +41,6 @@ class TypeaheadEditor extends Editor {
     const range = selection.getRangeAt(0);
     let text = range.startContainer.textContent;
 
-    // Remove text that appears after the cursor..
-    text = text.substring(0, range.startOffset);
-
     // ..and before the typeahead token.
     const index1 = text.lastIndexOf('@');
     const index2 = text.lastIndexOf('#');
@@ -153,7 +150,7 @@ class TypeaheadEditor extends Editor {
         this.props.handleTypeaheadReturn(
           this.typeaheadState.text, this.typeaheadState.selectedIndex, entitySelection
         );
-
+        
         this.typeaheadState = null;
         this.props.onTypeaheadChange && this.props.onTypeaheadChange(null);
       } else {

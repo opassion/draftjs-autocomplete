@@ -132,7 +132,7 @@ function Mentions ({ left, top, selectedIndex, text }) {
     <SelectDropdown left={left - rect.left} top={wrapper.scrollTop + top - rect.top}>
       {filteredList.map((item, index) => {
         return (
-          <SelectItem highlight={index === normalizedIndex}>
+          <SelectItem highlight={index === normalizedIndex} key={`list-${index}`}>
             {!!item.photo && 
               <img src={item.photo} />
             }
@@ -157,18 +157,22 @@ class MentionsEditorExample extends Component {
   onChange = (editorState) => this.setState({ editorState })
 
   onTypeaheadChange = (typeaheadState) => {
-    console.log(typeaheadState);
     this.setState({ typeaheadState });
   }
 
   handleTypeaheadReturn = (text, selectedIndex, selection) => {
     const { editorState } = this.state;
     const { key, filteredList } = getFilteredList(text);
-    const index = normalizeSelectedIndex(selectedIndex, filteredList.length);
+    let keyValue = text;
+    if (filteredList.length) {
+      const index = normalizeSelectedIndex(selectedIndex, filteredList.length);
+      keyValue = key + filteredList[index].value;
+    }
+    
     const contentStateWithEntity = Modifier.replaceText(
       editorState.getCurrentContent(),
       selection,
-      key + filteredList[index].value,
+      keyValue,
       null,
       MENTION_ENTITY_KEY
     );
