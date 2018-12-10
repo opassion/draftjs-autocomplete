@@ -1,33 +1,44 @@
-export const PERSON = [
+export const persons = [
   {
-    photo: 'http://54.65.240.103/react-dashboard/assets/images/avatars/avatar-1.png',
-    value: 'Justin Vaillancourt'
+    name: 'Matthew Russell',
+    link: 'https://twitter.com/mrussell247',
+    avatar: 'https://pbs.twimg.com/profile_images/517863945/mattsailing_400x400.jpg',
   },
   {
-    photo: 'http://54.65.240.103/react-dashboard/assets/images/avatars/avatar-2.png',
-    value: 'Ellie Pritts'
+    name: 'Julian Krispel-Samsel',
+    link: 'https://twitter.com/juliandoesstuff',
+    avatar: 'https://avatars2.githubusercontent.com/u/1188186?v=3&s=400',
   },
   {
-    photo: 'http://54.65.240.103/react-dashboard/assets/images/avatars/avatar-3.png',
-    value: 'Maxime Santerre'
+    name: 'Jyoti Puri',
+    link: 'https://twitter.com/jyopur',
+    avatar: 'https://avatars0.githubusercontent.com/u/2182307?v=3&s=400',
   },
   {
-    photo: 'http://54.65.240.103/react-dashboard/assets/images/avatars/avatar-4.png',
-    value: 'Melody Ma'
+    name: 'Max Stoiber',
+    link: 'https://twitter.com/mxstbr',
+    avatar: 'https://pbs.twimg.com/profile_images/763033229993574400/6frGyDyA_400x400.jpg',
   },
   {
-    photo: 'http://54.65.240.103/react-dashboard/assets/images/avatars/avatar-5.png',
-    value: 'Kris Hartvigsen'
-  }
+    name: 'Nik Graf',
+    link: 'https://twitter.com/nikgraf',
+    avatar: 'https://avatars0.githubusercontent.com/u/223045?v=3&s=400',
+  },
+  {
+    name: 'Pascal Brandt',
+    link: 'https://twitter.com/psbrandt',
+    avatar: 'https://pbs.twimg.com/profile_images/688487813025640448/E6O6I011_400x400.png',
+  },
 ];
 
-export const HASHTAG = [
-  { value: 'idea' }, 
-  { value: 'ideal' }, 
-  { value: 'tag1' }
-];
+export const hashes = [
+  { name: 'hash' },
+  { name: 'tag' },
+  { name: 'add' },
+  { name: 'mention' }
+]
 
-export const RELATION = [
-  { value: 'foodlink.co - Google.com food links' },
-  { value: 'food/group cooking coordination app' }
+export const relations = [
+  { name: 'foodlink.co - Google.com food links' },
+  { name: 'food/group cooking coordination app' }
 ];
